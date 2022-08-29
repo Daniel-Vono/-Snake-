@@ -6,6 +6,7 @@
 #include <iterator>
 #include <unistd.h>
 #include <ctime>
+#include <SDL2/SDL_mixer.h>
 
 enum Direction
 {
@@ -22,6 +23,8 @@ enum GameState
 
 std::list<Gameobject> snake;
 Gameobject apple;
+
+SDL_Rect menuSnakePos[3];
 
 TextBox gameOverText;
 TextBox restartText;
@@ -45,6 +48,9 @@ SDL_Texture* snakeFaceUpTex;
 SDL_Texture* snakeFaceDownTex;
 SDL_Texture* snakeFaceLeftTex;
 SDL_Texture* snakeFaceRightTex;
+
+Mix_Chunk* eatSound;
+Mix_Chunk* snakeBreakSound;
 
 Game::Game()
 {
@@ -81,6 +87,9 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 			SDL_SetRenderDrawColor(renderer, 112, 88, 72, 255);
 		}
 
+		//Init audio settings
+		Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
+
 		isRunning = true;
 
 		titleText.InitializeTextBox(192, 16, 0, 0, 0, 35, "+Snake+", renderer);
@@ -107,7 +116,23 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 		snakeFaceRightTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceRight);
 		SDL_FreeSurface(tempSurfaceRight);
 
+		eatSound = Mix_LoadWAV("Eat.wav");
+		snakeBreakSound = Mix_LoadWAV("SnakeBreak.wav");
+
 		//InitGame();
+
+		menuSnakePos[0].x = 64;
+		menuSnakePos[0].y = 192;
+		menuSnakePos[0].w = 64;
+		menuSnakePos[0].h = 64;
+		menuSnakePos[1].x = 128;
+		menuSnakePos[1].y = 192;
+		menuSnakePos[1].w = 64;
+		menuSnakePos[1].h = 64;
+		menuSnakePos[2].x = 192;
+		menuSnakePos[2].y = 192;
+		menuSnakePos[2].w = 64;
+		menuSnakePos[2].h = 64;
 	}
 	else
 	{
@@ -131,20 +156,27 @@ void Game::HandleEvents()
 
 		case SDL_KEYDOWN:
 
+			static int temp;
+			temp++;
+
 			if ((event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) && snakeDir != 1)
 			{
+				std::cout << "UP" << temp << std::endl;
 				snakeDir = Up;
 			}
 			if ((event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) && snakeDir != Up)
 			{
+				std::cout << "DOWN" << temp<< std::endl;
 				snakeDir = Down;
 			}
 			if ((event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) && snakeDir != Right)
 			{
+				std::cout << "LEFT" << temp << std::endl;
 				snakeDir = Left;
 			}
 			if ((event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) && snakeDir != Left)
 			{
+				std::cout << "RIGHT" << temp << std::endl;
 				snakeDir = Right;
 			}
 			if(gameOver && event.key.keysym.sym == SDLK_r){
@@ -300,14 +332,22 @@ void Game::RenderMenu(){
 	SDL_RenderCopy(renderer, titleText.texture, NULL, &titleText.destRect);
 	SDL_RenderCopy(renderer, startGameText.texture, NULL, &startGameText.destRect);
 
+	SDL_RenderCopy(renderer, snakeBodyTex, NULL, &menuSnakePos[0]);
+	SDL_RenderCopy(renderer, snakeBodyTex, NULL, &menuSnakePos[1]);
+	SDL_RenderCopy(renderer, snakeFaceRightTex, NULL, &menuSnakePos[2]);
+
 	// Displays the things we are rendering
 	SDL_RenderPresent(renderer);
 }
 
 void Game::Clean()
 {
+	Mix_FreeChunk(eatSound);
+	Mix_FreeChunk(snakeBreakSound);
+
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
+	Mix_Quit();
 	SDL_Quit();
 	std::cout << "Game Cleaned" << std::endl;
 }
@@ -371,12 +411,14 @@ void Game::EatApple(){
 	apple.destRect.y = apple.yPos;
 
 	score++;
-	//scoreTextGameplay.text = (char*)"Score: " + score;
+
+	Mix_PlayChannel(-1, eatSound, 0);
 }
 
 void Game::DeleteSnake(){
 	if(!snake.empty()){
 		snake.pop_front();
+		Mix_PlayChannel(-1, snakeBreakSound, 0);
 		usleep(50000);
 	}
 }
