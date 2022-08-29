@@ -342,12 +342,16 @@ void Game::RenderMenu(){
 
 void Game::Clean()
 {
+	std::cout << "Cleaning Mixer..." << std::endl;
 	Mix_FreeChunk(eatSound);
 	Mix_FreeChunk(snakeBreakSound);
+	Mix_CloseAudio();
+	Mix_Quit();
+
+	std::cout << "Mixer Cleaned." << std::endl;
 
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
-	Mix_Quit();
 	SDL_Quit();
 	std::cout << "Game Cleaned" << std::endl;
 }
@@ -372,7 +376,6 @@ void Game::InitGame(){
 
 
 	scoreTextGameOver.InitializeTextBox(220, 80, 0, 0, 0, 20, "Score:", renderer);
-	//scoreTextGameOverNum.InitializeTextBox(280, 80, 0, 0, 0, 20, "0", renderer);
 }
 
 void Game::EatApple(){
@@ -412,13 +415,14 @@ void Game::EatApple(){
 
 	score++;
 
-	Mix_PlayChannel(-1, eatSound, 0);
+	std::cout << "Audio Eat: " << Mix_PlayChannel(-1, eatSound, 0)  << std::endl;
+	//Mix_PlayChannel(-1, eatSound, 0);
 }
 
 void Game::DeleteSnake(){
 	if(!snake.empty()){
 		snake.pop_front();
-		Mix_PlayChannel(-1, snakeBreakSound, 0);
+		std::cout << "Audio Del: " << Mix_PlayChannel(-1, snakeBreakSound, 0) << std::endl;;
 		usleep(50000);
 	}
 }
