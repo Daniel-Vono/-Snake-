@@ -8,15 +8,13 @@
 #include <ctime>
 #include <SDL2/SDL_mixer.h>
 
-enum Direction
-{
+enum Direction{
 	Up,
 	Down,
 	Left,
 	Right
 };
-enum GameState
-{
+enum GameState{
 	Menu,
 	Gameplay
 };
@@ -52,8 +50,7 @@ SDL_Texture* snakeFaceRightTex;
 Mix_Chunk* eatSound;
 Mix_Chunk* snakeBreakSound;
 
-Game::Game()
-{
+Game::Game(){
 	srand((unsigned) time(0));
 	TTF_Init();
 }
@@ -61,28 +58,23 @@ Game::~Game()
 {
 }
 
-void Game::Init(const char *title, int xPos, int yPos, int width, int height, bool fullScreen)
-{
+void Game::Init(const char *title, int xPos, int yPos, int width, int height, bool fullScreen){
 
 	int flags = 0;
-	if (fullScreen)
-	{
+	if (fullScreen){
 		flags = SDL_WINDOW_FULLSCREEN;
 	}
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
-	{
+	if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
 		std::cout << "Subsystems..." << std::endl;
 
 		SDL_Window *window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
-		if (window)
-		{
+		if (window){
 			std::cout << "Window Created..." << std::endl;
 		}
 
 		renderer = SDL_CreateRenderer(window, -1, 0);
-		if (renderer)
-		{
+		if (renderer){
 			std::cout << "Renderer Created..." << std::endl;
 			SDL_SetRenderDrawColor(renderer, 112, 88, 72, 255);
 		}
@@ -134,21 +126,17 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 		menuSnakePos[2].w = 64;
 		menuSnakePos[2].h = 64;
 	}
-	else
-	{
+	else{
 		isRunning = false;
 	}
 }
 
-void Game::HandleEvents()
-{
+void Game::HandleEvents(){
 	SDL_Event event;
 
-	while (SDL_PollEvent(&event))
-	{
+	while (SDL_PollEvent(&event)){
 
-		switch (event.type)
-		{
+		switch (event.type){
 
 		case SDL_QUIT:
 			isRunning = false;
@@ -159,23 +147,19 @@ void Game::HandleEvents()
 			static int temp;
 			temp++;
 
-			if ((event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) && snakeDir != 1)
-			{
+			if ((event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) && snakeDir != 1){
 				std::cout << "UP" << temp << std::endl;
 				snakeDir = Up;
 			}
-			if ((event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) && snakeDir != Up)
-			{
+			if ((event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) && snakeDir != Up){
 				std::cout << "DOWN" << temp<< std::endl;
 				snakeDir = Down;
 			}
-			if ((event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) && snakeDir != Right)
-			{
+			if ((event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) && snakeDir != Right){
 				std::cout << "LEFT" << temp << std::endl;
 				snakeDir = Left;
 			}
-			if ((event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) && snakeDir != Left)
-			{
+			if ((event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) && snakeDir != Left){
 				std::cout << "RIGHT" << temp << std::endl;
 				snakeDir = Right;
 			}
@@ -245,22 +229,18 @@ void Game::UpdateGameplay(){
 
 		usleep(100000);
 
-		if (snake.front().xPos < 0 || snake.front().xPos > 511 || snake.front().yPos < 0 || snake.front().yPos > 511)
-		{
+		if (snake.front().xPos < 0 || snake.front().xPos > 511 || snake.front().yPos < 0 || snake.front().yPos > 511){
 			gameOver = true;
 			scoreTextGameOverNum.InitializeTextBox(280, 80, 0, 0, 0, 20, std::to_string(score), renderer);
 			DeleteSnake();
 			std::cout << "DEAD bound" << std::endl;
 			return;
 		}
-		else
-		{
+		else{
 			std::list<Gameobject>::iterator it = snake.begin();
 			std::advance(it, 2);
-			for (it; it != snake.end(); ++it)
-			{
-				if (BoxToBox(snake.begin()->destRect, it->destRect))
-				{
+			for (it; it != snake.end(); ++it){
+				if (BoxToBox(snake.begin()->destRect, it->destRect)){
 					gameOver = true;
 					scoreTextGameOverNum.InitializeTextBox(280, 80, 0, 0, 0, 20, std::to_string(score), renderer);
 					DeleteSnake();
@@ -281,8 +261,7 @@ void Game::UpdateGameplay(){
 	
 }
 
-void Game::Render()
-{
+void Game::Render(){
 	switch(currentState){
 		case Menu:
 			RenderMenu();
@@ -304,8 +283,7 @@ void Game::RenderGameplay(){
 
 	// Add Objects to Render Here
 
-	for (std::list<Gameobject>::iterator it = snake.begin(); it != snake.end(); ++it)
-	{
+	for (std::list<Gameobject>::iterator it = snake.begin(); it != snake.end(); ++it){
 		SDL_RenderCopy(renderer, it->texture, NULL, &it->destRect);
 	}
 
@@ -340,8 +318,7 @@ void Game::RenderMenu(){
 	SDL_RenderPresent(renderer);
 }
 
-void Game::Clean()
-{
+void Game::Clean(){
 	std::cout << "Cleaning Mixer..." << std::endl;
 	Mix_FreeChunk(eatSound);
 	Mix_FreeChunk(snakeBreakSound);
@@ -380,8 +357,7 @@ void Game::InitGame(){
 
 void Game::EatApple(){
 
-	switch (snakeDir)
-	{
+	switch (snakeDir){
 	case Up:
 		snake.front().texture = snakeBodyTex;
 		snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos - SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
@@ -407,47 +383,56 @@ void Game::EatApple(){
 		break;
 	}
 
-	apple.xPos = (rand() % 16) * SNAKE_SCALE;
-	apple.yPos = (rand() % 16) * SNAKE_SCALE;
+	GenerateApplePos();
 	std::cout << apple.destRect.x << " " << apple.destRect.y << std::endl;
-	apple.destRect.x = apple.xPos;
-	apple.destRect.y = apple.yPos;
 
 	score++;
 
-	std::cout << "Audio Eat: " << Mix_PlayChannel(-1, eatSound, 0)  << std::endl;
-	//Mix_PlayChannel(-1, eatSound, 0);
+	Mix_PlayChannel(-1, eatSound, 0);
 }
 
+void Game::GenerateApplePos(){
+
+	apple.destRect.x = (rand() % 16) * SNAKE_SCALE;
+	apple.destRect.y = (rand() % 16) * SNAKE_SCALE;
+	
+	std::list<Gameobject>::iterator it = snake.begin();
+	for (it; it != snake.end(); ++it){
+		if (BoxToBox(apple.destRect, it->destRect)){
+			GenerateApplePos();
+			break;
+		}
+	}
+}
+
+//Removes the head of the snake body
 void Game::DeleteSnake(){
+
+	//If the snake is empty
 	if(!snake.empty()){
+		
+		//Remove the head of the snake
 		snake.pop_front();
-		std::cout << "Audio Del: " << Mix_PlayChannel(-1, snakeBreakSound, 0) << std::endl;;
+
+		//Play the snake break sound effect
+		std::cout << "Audio Del: " << Mix_PlayChannel(-1, snakeBreakSound, 0) << std::endl;
+
+		//Make the program sleep
 		usleep(50000);
 	}
 }
 
-bool Game::BoxToBox(SDL_Rect box1, SDL_Rect box2)
-{
+//Checks collision between 2 SDL rects
+bool Game::BoxToBox(SDL_Rect box1, SDL_Rect box2){
 
-	if ((box1.x + box1.w) < box2.x + 1)
-	{ /*std::cout << "No Left X Collision" << std::endl;*/
-		return false;
-	}
-	else if ((box1.x) > (box2.x + box2.w - 1))
-	{ /*std::cout << "No Right X Collision" << std::endl;*/
-		return false;
-	}
-	else if ((box1.y + box1.h) < box2.y + 1)
-	{ /*std::cout << "No Top Y Collision" << std::endl;*/
-		return false;
-	}
-	else if (box1.y > (box2.y + box2.h - 1))
-	{ /*std::cout << "No Bottom Y Collision" << std::endl;*/
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	//No collision on the left (-x)
+	if ((box1.x + box1.w) < box2.x + 1) { return false; }
+	//No collision on the right (+x)
+	else if ((box1.x) > (box2.x + box2.w - 1)) { return false; }
+	//No collision on the top (-y)
+	else if ((box1.y + box1.h) < box2.y + 1) { return false; }
+	//No collision on the bottom (+y)
+	else if (box1.y > (box2.y + box2.h - 1)) { return false; }
+	//Collision between the boxes
+	else { return true; }
 }

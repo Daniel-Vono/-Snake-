@@ -25,6 +25,7 @@ public:
 	void InitGame();
 
 	void EatApple();
+	void GenerateApplePos();
 	void DeleteSnake();
 
 	void UpdateGameplay();
