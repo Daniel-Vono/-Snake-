@@ -6,10 +6,9 @@
 
 class Gameobject {
 	public:
-		void InitializeGameobject(int x, int y, int w, int h, char texturePath[], SDL_Renderer* renderer);
 		void UpdatePosition();
 		void RevertPosition();
-		Gameobject(int x, int y, int w, int h, char texturePath[], SDL_Renderer* renderer);
+		Gameobject(int x, int y, int w, int h, SDL_Texture* tex, SDL_Renderer* renderer);
 		Gameobject();
 
 		int xPos;

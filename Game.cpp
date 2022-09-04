@@ -46,6 +46,7 @@ SDL_Texture* snakeFaceUpTex;
 SDL_Texture* snakeFaceDownTex;
 SDL_Texture* snakeFaceLeftTex;
 SDL_Texture* snakeFaceRightTex;
+SDL_Texture* appleTex;
 
 Mix_Chunk* eatSound;
 Mix_Chunk* snakeBreakSound;
@@ -107,6 +108,10 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 		SDL_Surface* tempSurfaceRight = IMG_Load(snakeFaceRightPath);
 		snakeFaceRightTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceRight);
 		SDL_FreeSurface(tempSurfaceRight);
+
+		SDL_Surface* tempSurfaceApple = IMG_Load(appleTexturePath);
+		appleTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceApple);
+		SDL_FreeSurface(tempSurfaceApple);
 
 		eatSound = Mix_LoadWAV("Eat.wav");
 		snakeBreakSound = Mix_LoadWAV("SnakeBreak.wav");
@@ -200,28 +205,28 @@ void Game::UpdateGameplay(){
 		switch (snakeDir){
 			case Up:
 				snake.front().texture = snakeBodyTex;
-				snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos - SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
+				snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos - SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
 				snake.pop_back();
 				snake.front().texture = snakeFaceUpTex;
 				break;
 
 			case Down:
 				snake.front().texture = snakeBodyTex;
-				snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos + SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
+				snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos + SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
 				snake.pop_back();
 				snake.front().texture = snakeFaceDownTex;
 				break;
 
 			case Left:
 				snake.front().texture = snakeBodyTex;
-				snake.push_front(Gameobject(snake.front().xPos - SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
+				snake.push_front(Gameobject(snake.front().xPos - SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
 				snake.pop_back();
 				snake.front().texture = snakeFaceLeftTex;
 				break;
 
 			case Right:
 				snake.front().texture = snakeBodyTex;
-				snake.push_front(Gameobject(snake.front().xPos + SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
+				snake.push_front(Gameobject(snake.front().xPos + SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
 				snake.pop_back();
 				snake.front().texture = snakeFaceRightTex;
 				break;
@@ -319,10 +324,13 @@ void Game::RenderMenu(){
 }
 
 void Game::Clean(){
-	std::cout << "Cleaning Mixer..." << std::endl;
+	std::cout << "Cleaning chun..." << std::endl;
 	Mix_FreeChunk(eatSound);
+	std::cout << "Cleaning chun2..." << std::endl;
 	Mix_FreeChunk(snakeBreakSound);
+	std::cout << "close Mixer..." << std::endl;
 	Mix_CloseAudio();
+	std::cout << "quit Mixer..." << std::endl;
 	Mix_Quit();
 
 	std::cout << "Mixer Cleaned." << std::endl;
@@ -342,11 +350,12 @@ void Game::InitGame(){
 
 	score = 0;
 
-	snake.push_back(Gameobject(96, 128, SNAKE_SCALE, SNAKE_SCALE, snakeFaceRightPath, renderer));
-	snake.push_back(Gameobject(80, 128, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
-	snake.push_back(Gameobject(64, 128, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
+	snake.push_back(Gameobject(96, 128, SNAKE_SCALE, SNAKE_SCALE, snakeFaceRightTex, renderer));
+	snake.push_back(Gameobject(80, 128, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
+	snake.push_back(Gameobject(64, 128, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
 
-	apple.InitializeGameobject(384, 256, SNAKE_SCALE, SNAKE_SCALE, appleTexturePath, renderer);
+	apple = Gameobject(384, 256, SNAKE_SCALE, SNAKE_SCALE, appleTex, renderer);
+
 
 	gameOverText.InitializeTextBox(170, 32, 0, 0, 0, 35, "Game Over", renderer);
 	restartText.InitializeTextBox(120, 442, 0, 0, 0, 30, "Press R to play again", renderer);
@@ -355,50 +364,82 @@ void Game::InitGame(){
 	scoreTextGameOver.InitializeTextBox(220, 80, 0, 0, 0, 20, "Score:", renderer);
 }
 
+//Eats the existing apple and increases the length of the snake
 void Game::EatApple(){
 
+	//Based on the directon of the snake
 	switch (snakeDir){
-	case Up:
-		snake.front().texture = snakeBodyTex;
-		snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos - SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
-		snake.front().texture = snakeFaceUpTex;
-		break;
 
-	case Down:
-		snake.front().texture = snakeBodyTex;
-		snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos + SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
-		snake.front().texture = snakeFaceDownTex;
-		break;
+		case Up:
 
-	case Left:
-		snake.front().texture = snakeBodyTex;
-		snake.push_front(Gameobject(snake.front().xPos - SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
-		snake.front().texture = snakeFaceLeftTex;
-		break;
+			//Set the old head texture to the body texture
+			snake.front().texture = snakeBodyTex;
 
-	case Right:
-		snake.front().texture = snakeBodyTex;
-		snake.push_front(Gameobject(snake.front().xPos + SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyPath, renderer));
-		snake.front().texture = snakeFaceRightTex;
-		break;
+			//Add a new snake segment to the head and set the texture to the snake head texture
+			snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos - SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
+			snake.front().texture = snakeFaceUpTex;
+
+			break;
+
+		case Down:
+
+			//Set the old head texture to the body texture
+			snake.front().texture = snakeBodyTex;
+
+			//Add a new snake segment to the head and set the texture to the snake head texture
+			snake.push_front(Gameobject(snake.front().xPos, snake.front().yPos + SNAKE_SCALE, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
+			snake.front().texture = snakeFaceDownTex;
+
+			break;
+
+		case Left:
+
+			//Set the old head texture to the body texture
+			snake.front().texture = snakeBodyTex;
+
+			//Add a new snake segment to the head and set the texture to the snake head texture
+			snake.push_front(Gameobject(snake.front().xPos - SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
+			snake.front().texture = snakeFaceLeftTex;
+
+			break;
+
+		case Right:
+
+			//Set the old head texture to the body texture
+			snake.front().texture = snakeBodyTex;
+
+			//Add a new snake segment to the head and set the texture to the snake head texture
+			snake.push_front(Gameobject(snake.front().xPos + SNAKE_SCALE, snake.front().yPos, SNAKE_SCALE, SNAKE_SCALE, snakeBodyTex, renderer));
+			snake.front().texture = snakeFaceRightTex;
+
+			break;
 	}
 
+	//Generate a new position for the apple
 	GenerateApplePos();
-	std::cout << apple.destRect.x << " " << apple.destRect.y << std::endl;
 
+	//Increment the score
 	score++;
 
+	//Plays the eat apple sound
 	Mix_PlayChannel(-1, eatSound, 0);
 }
 
+//Generates a new currently empty position for the apple
 void Game::GenerateApplePos(){
 
+	//Generates a random position for the apple
 	apple.destRect.x = (rand() % 16) * SNAKE_SCALE;
 	apple.destRect.y = (rand() % 16) * SNAKE_SCALE;
 	
+	//Checks each segment of the snake to see if the apple exists inide the snake
 	std::list<Gameobject>::iterator it = snake.begin();
 	for (it; it != snake.end(); ++it){
+
+		//If the apple dest rect collides with a snake segment dest rect
 		if (BoxToBox(apple.destRect, it->destRect)){
+
+			//Generate a new apple position and break from the loop once done
 			GenerateApplePos();
 			break;
 		}
