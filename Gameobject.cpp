@@ -1,5 +1,7 @@
+//Includes the header files used to define class in the file
 #include "Gameobject.hpp"
 
+//Initializes the gameobject
 Gameobject::Gameobject(int x, int y, int w, int h, SDL_Texture* tex, SDL_Renderer* renderer) {
 	
 	//Initializes the positions and dimensions
@@ -18,16 +20,5 @@ Gameobject::Gameobject(int x, int y, int w, int h, SDL_Texture* tex, SDL_Rendere
 	texture = tex;
 }
 
-Gameobject::Gameobject(){
-	
-}
-
-void Gameobject::UpdatePosition() {
-	xPos = destRect.x;
-	yPos = destRect.y;
-}
-
-void Gameobject::RevertPosition() {
-	destRect.x = xPos;
-	destRect.y = yPos;
-}
+//Initializes the gameobject with all null values
+Gameobject::Gameobject(){}

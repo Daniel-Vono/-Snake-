@@ -1,41 +1,78 @@
 #ifndef Game_hpp
 #define Game_hpp
 
+//Includes the libraries used for SDL
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <iostream>
+#include <SDL2/SDL_mixer.h>
 
+//Includes libraries for time and sleeping
+#include <ctime>
+#include <unistd.h>
+
+//Includes libraries for the list and iterator data types
+#include <list>
+#include <iterator>
+
+//All of the games main procceses are contained in this class
 class Game {
-public:
-	Game();
-	~Game();
 
-	void Init(const char* title, int xPos, int yPos, int width, int height, bool fullScreen);
-	void HandleEvents();
-	void Update();
-	void Render();
-	void Clean();
+	public:
+		//Game class constructor and deconstructor
+		Game();
+		~Game();
 
-	bool Running() { return isRunning; };
+		//Initializes the Game class
+		void Init(const char* title, int xPos, int yPos, int width, int height, bool fullScreen);
 
-	bool BoxToBox(SDL_Rect box1, SDL_Rect box2);
-	bool SideToBox(SDL_Rect box1, SDL_Rect box2);
+		//Handles input for the game
+		void HandleEvents();
 
-	void InitGame();
+		//Switches between different sub update functions based on the game state
+		void Update();
 
-	void EatApple();
-	void GenerateApplePos();
-	void DeleteSnake();
+		//Switches between different sub rendering functions based on the game state
+		void Render();
+		
+		//Closes and removes any existing processes in the game
+		void Clean();
 
-	void UpdateGameplay();
-	void RenderGameplay();
-	void RenderMenu();
+		//Returns if the game is running
+		bool IsRunning() { return isRunning; };
 
-private:
-	bool isRunning;
-	SDL_Window* window;
-	SDL_Renderer* renderer;
+		//Checks collision between 2 SDL rects
+		bool BoxToBox(SDL_Rect box1, SDL_Rect box2);
+
+
+		//Called to initialize/restart the game
+		void InitGame();
+
+
+		//Eats the existing apple and increases the length of the snake
+		void EatApple();
+
+		//Generates a new currently empty position for the apple
+		void GenerateApplePos();
+
+		//Removes the head of the snake body
+		void DeleteSnake();
+
+
+		//Renders everything durring gameplay
+		void RenderGameplay();
+
+		//Renders everything in the menu screen
+		void RenderMenu();
+
+	private:
+		
+		//States if the game is running or not
+		bool isRunning;
+
+		//Contains the SDL window and renderer
+		SDL_Window* window;
+		SDL_Renderer* renderer;
 };
 
-#endif // !Game_hpp
+#endif
