@@ -18,10 +18,6 @@ class TextBox{
         //Initializes the text box
         void InitializeTextBox(int x, int y, int r, int g, int b, int size, std::string msg, SDL_Renderer* renderer);
 
-        //Text box position
-        int xPos;
-        int yPos;
-
         //Text box dest rect
         SDL_Rect destRect;
 

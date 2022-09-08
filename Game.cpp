@@ -102,38 +102,38 @@ void Game::Init(const char *title, int xPos, int yPos, int width, int height, bo
 		startGameText.InitializeTextBox(192/2, 456, 0, 0, 0, 35, "Press Space To Start", renderer);
 		
 		//Creates the snake body texture
-		SDL_Surface* tempSurfaceBody = IMG_Load("SnakeBody.png");
+		SDL_Surface* tempSurfaceBody = IMG_Load("src/sprites/SnakeBody.png");
 		snakeBodyTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceBody);
 		SDL_FreeSurface(tempSurfaceBody);
 
 		//Ceates the snake face up texture
-		SDL_Surface* tempSurfaceUp = IMG_Load("SnakeFaceUp.png");
+		SDL_Surface* tempSurfaceUp = IMG_Load("src/sprites/SnakeFaceUp.png");
 		snakeFaceUpTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceUp);
 		SDL_FreeSurface(tempSurfaceUp);
 
 		//Ceates the snake face down texture
-		SDL_Surface* tempSurfaceDown = IMG_Load("SnakeFaceDown.png");
+		SDL_Surface* tempSurfaceDown = IMG_Load("src/sprites/SnakeFaceDown.png");
 		snakeFaceDownTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceDown);
 		SDL_FreeSurface(tempSurfaceDown);
 
 		//Ceates the snake face left texture
-		SDL_Surface* tempSurfaceLeft = IMG_Load("SnakeFaceLeft.png");
+		SDL_Surface* tempSurfaceLeft = IMG_Load("src/sprites/SnakeFaceLeft.png");
 		snakeFaceLeftTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceLeft);
 		SDL_FreeSurface(tempSurfaceLeft);
 
 		//Ceates the snake face right texture
-		SDL_Surface* tempSurfaceRight = IMG_Load("SnakeFaceRight.png");
+		SDL_Surface* tempSurfaceRight = IMG_Load("src/sprites/SnakeFaceRight.png");
 		snakeFaceRightTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceRight);
 		SDL_FreeSurface(tempSurfaceRight);
 
 		//Ceates the apple texture
-		SDL_Surface* tempSurfaceApple = IMG_Load("Apple.png");
+		SDL_Surface* tempSurfaceApple = IMG_Load("src/sprites/Apple.png");
 		appleTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceApple);
 		SDL_FreeSurface(tempSurfaceApple);
 
 		//Loads the sound effects
-		eatSound = Mix_LoadWAV("Eat.wav");
-		snakeBreakSound = Mix_LoadWAV("SnakeBreak.wav");
+		eatSound = Mix_LoadWAV("src/audio/Eat.wav");
+		snakeBreakSound = Mix_LoadWAV("src/audio/SnakeBreak.wav");
 
 		//Sets the positions used for textures in the menu
 		menuSnakeRect[0].x = 64;

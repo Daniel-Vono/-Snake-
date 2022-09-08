@@ -3,16 +3,12 @@
 
 //Initializes the text box
 void TextBox::InitializeTextBox(int x, int y, int r, int g, int b, int size, std::string msg, SDL_Renderer* renderer){
-    
-    //Initializes the text box position
-    xPos = x;
-    yPos = y;
 
     //Sets the font size
     fontSize = size;
 
     //Sets the font
-    font = TTF_OpenFont("OpenSans.ttf", size);
+    font = TTF_OpenFont("src/fonts/OpenSans.ttf", size);
 
     //Sets the text colour
     SDL_Color clr;
@@ -25,7 +21,9 @@ void TextBox::InitializeTextBox(int x, int y, int r, int g, int b, int size, std
     SDL_Surface* tempSurface = TTF_RenderText_Solid(font, msg.c_str(), color);
     texture = SDL_CreateTextureFromSurface(renderer, tempSurface);
 
-    //Initialize the size of the dest rect
+    //Initialize the dest rect
+    destRect.x = x;
+    destRect.y = y;
     destRect.w = tempSurface->w;
     destRect.h = tempSurface->h;
 
